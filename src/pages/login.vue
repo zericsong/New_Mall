@@ -38,6 +38,12 @@
 
 <script setup>
 import { ref,reactive } from 'vue'
+import { ElNotification } from 'element-plus'
+import { useRouter } from 'vue-router'
+import { login } from '~/api/manager'
+
+const router = useRouter()
+
 // do not use same name with ref
 const form = reactive({
   username:"",
@@ -68,7 +74,29 @@ const onSubmit = () => {
         if(!valid){
             return false
         }
-        console.log("验证通过");
+        login(form.username,form.password)
+        .then(res=>{
+            console.log(res.data.data);
+
+            // 提示成功
+            ElNotification({
+                message: "登录成功",
+                type: 'success',
+                duration:3000
+            })
+
+            // 存储token和用户相关信息，下节课讲
+
+            // 跳转到后台首页
+            router.push("/")
+        })
+        .catch(err=>{
+            ElNotification({
+                message: err.response.data.msg || "请求失败",
+                type: 'error',
+                duration:3000
+            })
+        })
     })
 }
 </script>
